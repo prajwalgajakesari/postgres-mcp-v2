@@ -35,6 +35,10 @@ Features include:
 - **📈 Query Plans** - validate and optimize performance by reviewing EXPLAIN plans and simulating the impact of hypothetical indexes.
 - **🧠 Schema Intelligence** - context-aware SQL generation based on detailed understanding of the database schema.
 - **🛡️ Safe SQL Execution** - configurable access control, including support for read-only mode and safe SQL parsing, making it usable for both development and production.
+- **📊 Data Import/Export** - high-performance data operations using COPY protocol with support for CSV, JSON, JSONL, and TSV formats, with validation and auto-table creation.
+- **💾 Backup & Restore** - comprehensive backup management with pg_dump/pg_restore integration, supporting all PostgreSQL backup formats and automated retention policies.
+- **🗄️ Database Management** - complete database lifecycle management including creation, cloning, dropping, and automated maintenance with VACUUM and ANALYZE operations.
+- **📂 Table Partitioning** - intelligent partitioning strategies including range, list, and hash partitioning with automated maintenance and distribution analysis.
 
 Postgres MCP Pro supports both the [Standard Input/Output (stdio)](https://modelcontextprotocol.io/docs/concepts/transports#standard-input%2Foutput-stdio) and [Server-Sent Events (SSE)](https://modelcontextprotocol.io/docs/concepts/transports#server-sent-events-sse) transports, for flexibility in different environments.
 
@@ -307,6 +311,26 @@ Ask:
 Ask:
 > Help me optimize this query: SELECT \* FROM orders JOIN customers ON orders.customer_id = customers.id WHERE orders.created_at > '2023-01-01';
 
+### Export Data to CSV
+
+Ask:
+> Export the orders table to a CSV file for the last month.
+
+### Create Database Backup
+
+Ask:
+> Create a backup of the production database with custom compression.
+
+### Clone Database for Testing
+
+Ask:
+> Clone the production database to staging for testing purposes.
+
+### Set Up Table Partitioning
+
+Ask:
+> Help me partition the events table by month for better query performance.
+
 ## MCP Server API
 
 The [MCP standard](https://modelcontextprotocol.io/) defines various types of endpoints: Tools, Resources, Prompts, and others.
@@ -329,6 +353,19 @@ Postgres MCP Pro Tools:
 | `analyze_workload_indexes` | Analyzes the database workload to identify resource-intensive queries, then recommends optimal indexes for them. |
 | `analyze_query_indexes` | Analyzes a list of specific SQL queries (up to 10) and recommends optimal indexes for them. |
 | `analyze_db_health` | Performs comprehensive health checks including: buffer cache hit rates, connection health, constraint validation, index health (duplicate/unused/invalid), sequence limits, and vacuum health. |
+| **Phase 3: Data Management** | |
+| `copy_data` | High-performance data transfer using PostgreSQL COPY protocol - between files and tables or between tables. |
+| `export_data` | Export data from PostgreSQL to various formats (CSV, JSON, JSONL, TSV) with streaming support. |
+| `import_data` | Import data into PostgreSQL with validation, auto-table creation, and conflict resolution. |
+| `create_backup` | Create database backups using pg_dump with support for all PostgreSQL backup formats. |
+| `restore_backup` | Restore database backups using pg_restore with parallel job support. |
+| `manage_backups` | List, validate, and manage backup retention policies. |
+| `create_database` | Create new databases with custom encoding, collation, and extensions. |
+| `drop_database` | Safely drop databases with active connection termination. |
+| `clone_database` | Clone databases using template or pg_dump methods. |
+| `manage_databases` | List databases, run VACUUM/ANALYZE, and monitor database activity. |
+| `create_partition` | Create partitioned tables with range, list, or hash strategies. |
+| `manage_partitions` | Analyze partition distribution, suggest strategies, and automate maintenance. |
 
 
 ## Related Projects

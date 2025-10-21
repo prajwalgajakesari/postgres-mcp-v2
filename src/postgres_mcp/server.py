@@ -32,6 +32,11 @@ from .sql import SqlDriver
 from .sql import check_hypopg_installation_status
 from .sql import obfuscate_password
 from .top_queries import TopQueriesCalc
+from .user_tools import register_user_tools
+from .table_tools import register_table_tools
+from .index_tools import register_index_tools
+from .function_tools import register_function_tools
+from .data_tools import create_data_tools, handle_copy_data, handle_export_data, handle_import_data
 
 # Initialize FastMCP with default settings
 mcp = FastMCP("postgres-mcp")
@@ -388,7 +393,7 @@ If there is no hypothetical index, you can pass an empty list.""",
 
 # Query function declaration without the decorator - we'll add it dynamically based on access mode
 async def execute_sql(
-    sql: str = Field(description="SQL to run", default="all"),
+    sql: str = Field(description="SQL query to execute"),
 ) -> ResponseType:
     """Executes a SQL query against the database."""
     try:
@@ -566,6 +571,33 @@ async def main():
     try:
         await db_connection.pool_connect(database_url)
         logger.info("Successfully connected to database and initialized connection pool")
+
+        # Register user management tools
+        register_user_tools(mcp, db_connection)
+        logger.info("Registered user management tools")
+
+        # Register table management tools
+        register_table_tools(mcp, db_connection)
+        logger.info("Registered table management tools")
+
+        # Register index management tools
+        register_index_tools(mcp, db_connection)
+        logger.info("Registered index management tools")
+
+        # Register function management tools
+        register_function_tools(mcp, db_connection)
+        logger.info("Registered function management tools")
+
+        # Register data import/export tools
+        data_tools = create_data_tools(db_connection)
+        for tool in data_tools:
+            if tool.name == "copy_data":
+                mcp.register_tool(tool)(lambda arguments=None: handle_copy_data(arguments, db_connection))
+            elif tool.name == "export_data":
+                mcp.register_tool(tool)(lambda arguments=None: handle_export_data(arguments, db_connection))
+            elif tool.name == "import_data":
+                mcp.register_tool(tool)(lambda arguments=None: handle_import_data(arguments, db_connection))
+        logger.info("Registered data import/export tools")
     except Exception as e:
         logger.warning(
             f"Could not connect to database: {obfuscate_password(str(e))}",
